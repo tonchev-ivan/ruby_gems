@@ -33,7 +33,7 @@ module GeminaboxApp
       def validate(username, authenticated_user)
         if authenticated_user
 
-          ldap_groups = @ldap.groups_of(authenticated_user.first.dn)
+          ldap_groups = @ldap.groups_of(authenticated_user.first.cn.first)
           user = User.find(username) || User.new(username, SecureRandom.uuid)
           user.ldap_groups = ldap_groups
           user.save

@@ -31,15 +31,19 @@ module GeminaboxApp
       conn.bind_as(filter: filter, password: password)
     end
 
-    def groups_of(user_dn)
+    def groups_of(user_cn)
       conn = ldap_connection
       return false unless conn
 
-      filter = @configs[:ldap_group_filter].gsub(/{dn}/, user_dn)
+      filter = "CN=#{user_cn}"
       conn.search(
         base: @configs[:ldap_group_base],
         filter: filter
-      ).map(&:cn).flatten.compact
+      ).first.memberof.map{ |group| group.split(',').first.split('=').last }
+    end
+
+    def config
+      @configs
     end
 
     private
@@ -92,7 +96,8 @@ module GeminaboxApp
         ldap_group_filter: '(&(objectClass=groupOfNames)(member={dn}))',
         ldaps: false,
         starttls: false,
-        tls_options: nil
+        tls_options: nil,
+        admin_group: 'admin'
       }
     end
   end

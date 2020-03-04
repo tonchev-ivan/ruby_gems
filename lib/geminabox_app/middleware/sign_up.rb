@@ -22,7 +22,7 @@ module GeminaboxApp
 
         api_key = create_or_find_user_api_key(
           env['REMOTE_USER'],
-          env['REMOTE_USER_DN']
+          env['REMOTE_USER_CN']
         )
 
         html_response(200, "<h1>Your Api Key is : #{api_key}</h1>")
@@ -41,15 +41,15 @@ module GeminaboxApp
         return unauthorized unless valid_user
 
         env['REMOTE_USER'] = auth.username
-        env['REMOTE_USER_DN'] = valid_user.first.dn
+        env['REMOTE_USER_CN'] = valid_user.first.cn.first
 
         auth
       end
 
-      def create_or_find_user_api_key(username, user_dn)
+      def create_or_find_user_api_key(username, user_cn)
         raise if username.nil?
 
-        ldap_groups = @ldap.groups_of(user_dn)
+        ldap_groups = @ldap.groups_of(user_cn)
         user = User.find(username) || User.new(username, SecureRandom.uuid)
         user.ldap_groups = ldap_groups
         user.save

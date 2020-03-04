@@ -12,3 +12,4 @@ production: &ldap_defaults
   ldaps: false
   starttls: false
   tls_options: nil
+  admin_group:  <%= ENV.fetch('ADMIN_GROUP', 'admin') %>
